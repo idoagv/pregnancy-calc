@@ -227,4 +227,13 @@ button.primary:hover { filter: brightness(1.05); }
     .row { flex-direction: column; }
     .patients { font-size: 0.85rem; }
     .patients th, .patients td { padding: 6px; }
+    .result-row.screening {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+    .result-row.screening strong {
+        white-space: nowrap;
+        font-size: 0.9rem;
+    }
 }
