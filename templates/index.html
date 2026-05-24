@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h1>{{ t('title') }}</h1>
+    <p class="subtitle">{{ t('subtitle') }}</p>
+
+    {% for msg in messages %}
+        <div class="flash">{{ msg }}</div>
+    {% endfor %}
+    {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+
+    <form method="get" action="{{ url_for('index') }}" class="calc-form">
+        <input type="hidden" name="calc" value="1">
+
+        <div class="tabs">
+            <label class="tab">
+                <input type="radio" name="mode" value="lmp"
+                       {% if form.mode == 'lmp' %}checked{% endif %}>
+                <span>{{ t('tab_lmp') }}</span>
+            </label>
+            <label class="tab">
+                <input type="radio" name="mode" value="age"
+                       {% if form.mode == 'age' %}checked{% endif %}>
+                <span>{{ t('tab_age') }}</span>
+            </label>
+        </div>
+
+        <div class="pane" data-mode="lmp">
+            <label>
+                {{ t('lmp_label') }}
+                <input type="date" name="lmp" value="{{ form.lmp }}">
+            </label>
+        </div>
+
+        <div class="pane" data-mode="age">
+            <label>
+                {{ t('as_of_label') }}
+                <input type="date" name="as_of" value="{{ form.as_of }}">
+            </label>
+            <div class="row">
+                <label>
+                    {{ t('weeks_label') }}
+                    <input type="number" name="weeks" min="0" max="45"
+                           value="{{ form.weeks }}">
+                </label>
+                <label>
+                    {{ t('days_label') }}
+                    <input type="number" name="days" min="0" max="6"
+                           value="{{ form.days }}">
+                </label>
+            </div>
+        </div>
+
+        <label class="cycle">
+            {{ t('cycle_label') }}
+            <input type="number" name="cycle" min="20" max="45"
+                   value="{{ form.cycle or 28 }}">
+        </label>
+
+        <button type="submit" class="primary">{{ t('calc_button') }}</button>
+    </form>
+
+    {% if result %}
+    <section class="results">
+        <div class="result-row">
+            <span>{{ t('result_edd') }}</span>
+            <strong>{{ result.edd.isoformat() }}</strong>
+        </div>
+        <div class="result-row">
+            <span>{{ t('result_now') }}</span>
+            <strong>{{ result.weeks }}{{ t('weeks_short') }} {{ result.days }}{{ t('days_short') }}</strong>
+        </div>
+        <div class="result-row">
+            <span>{{ t('result_trimester') }}</span>
+            <strong>{{ result.trimester }}</strong>
+        </div>
+        <div class="result-row">
+            <span>{{ t('result_remaining') }}</span>
+            <strong>{{ result.days_remaining }}</strong>
+        </div>
+
+        <details class="save">
+            <summary>{{ t('save_heading') }}</summary>
+            <form method="post" action="{{ url_for('save') }}" class="save-form">
+                <input type="hidden" name="lmp" value="{{ result.lmp.isoformat() }}">
+                <input type="hidden" name="edd" value="{{ result.edd.isoformat() }}">
+                <label>
+                    {{ t('save_name') }}
+                    <input type="text" name="name" required>
+                </label>
+                <label>
+                    {{ t('save_phone') }}
+                    <input type="tel" name="phone" required>
+                </label>
+                <label>
+                    {{ t('save_notes') }}
+                    <textarea name="notes" rows="2"></textarea>
+                </label>
+                <button type="submit">{{ t('save_button') }}</button>
+            </form>
+        </details>
+    </section>
+    {% endif %}
+</section>
+
+<script src="{{ url_for('static', filename='js/calc.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <h1>{{ t('patients_title') }}</h1>
+    <p><a href="{{ url_for('index') }}">&larr; {{ t('back') }}</a></p>
+
+    {% if patients %}
+    <table class="patients">
+        <thead>
+            <tr>
+                <th>{{ t('col_name') }}</th>
+                <th>{{ t('col_phone') }}</th>
+                <th>{{ t('col_lmp') }}</th>
+                <th>{{ t('col_edd') }}</th>
+                <th>{{ t('col_notes') }}</th>
+                <th>{{ t('col_created') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in patients %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.phone }}</td>
+                <td>{{ p.lmp.isoformat() if p.lmp else '' }}</td>
+                <td>{{ p.edd.isoformat() if p.edd else '' }}</td>
+                <td>{{ p.notes or '' }}</td>
+                <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="empty">{{ t('no_patients') }}</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ t('title') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">{{ t('title') }}</a>
+    <nav>
+        <a href="{{ url_for('patients') }}">{{ t('patients_link') }}</a>
+        <a href="{{ url_for('set_lang', code=other_lang) }}" class="lang-toggle">{{ t('lang_other') }}</a>
+    </nav>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>
