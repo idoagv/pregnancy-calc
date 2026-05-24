@@ -162,6 +162,40 @@ button.primary:hover { filter: brightness(1.05); }
 .result-row span { color: var(--muted); }
 .result-row strong { font-size: 1.1rem; }
 
+.screenings-heading {
+    margin: 20px 0 4px;
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+.result-row.screening strong {
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.result-row.screening .badge {
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.status-passed .badge {
+    background: #f3f4f6;
+    color: var(--muted);
+}
+.status-current { background: #ecfdf5; }
+.status-current .badge {
+    background: #10b981;
+    color: #fff;
+}
+.status-upcoming .badge {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
 .save { margin-top: 20px; }
 .save summary {
     cursor: pointer;

@@ -38,6 +38,44 @@ class Status:
     days_remaining: int
 
 
+# Standard Israeli prenatal ultrasound screening windows, LMP-anchored.
+# Each entry: (i18n_key, (start_week, start_day), (end_week, end_day)) — inclusive bounds.
+SCREENING_WINDOWS = [
+    ("screening_nuchal", (11, 0), (13, 6)),
+    ("screening_early", (14, 0), (16, 6)),
+    ("screening_second", (20, 0), (24, 6)),
+    ("screening_third", (30, 0), (32, 0)),
+]
+
+
+@dataclass
+class ScreeningWindow:
+    key: str          # i18n key for the test name
+    start: date       # inclusive
+    end: date         # inclusive
+    status: str       # "passed" | "current" | "upcoming"
+
+
+def screening_windows(lmp: date, today: date) -> list["ScreeningWindow"]:
+    """For each standard screening, compute its date window and current status.
+
+    Cycle length is intentionally not applied — Israeli clinical practice
+    anchors these windows to LMP directly.
+    """
+    out: list[ScreeningWindow] = []
+    for key, (sw, sd), (ew, ed) in SCREENING_WINDOWS:
+        start = lmp + timedelta(days=sw * 7 + sd)
+        end = lmp + timedelta(days=ew * 7 + ed)
+        if today < start:
+            st = "upcoming"
+        elif today > end:
+            st = "passed"
+        else:
+            st = "current"
+        out.append(ScreeningWindow(key=key, start=start, end=end, status=st))
+    return out
+
+
 def status(lmp: date, today: date, cycle_length: int = 28) -> Status:
     """Snapshot of where the pregnancy is as of `today`."""
     edd = edd_from_lmp(lmp, cycle_length)

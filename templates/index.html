@@ -79,6 +79,17 @@
             <strong>{{ result.days_remaining }}</strong>
         </div>
 
+        <h3 class="screenings-heading">{{ t('screenings_heading') }}</h3>
+        {% for w in result.screenings %}
+        <div class="result-row screening status-{{ w.status }}">
+            <span>{{ t(w.key) }}</span>
+            <strong>
+                {{ w.start.isoformat() }} → {{ w.end.isoformat() }}
+                <em class="badge">{{ t('status_' ~ w.status) }}</em>
+            </strong>
+        </div>
+        {% endfor %}
+
         <details class="save">
             <summary>{{ t('save_heading') }}</summary>
             <form method="post" action="{{ url_for('save') }}" class="save-form">

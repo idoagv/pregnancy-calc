@@ -12,7 +12,7 @@ from flask import (
     url_for,
 )
 
-from calc import edd_from_lmp, lmp_from_gestational_age, status
+from calc import edd_from_lmp, lmp_from_gestational_age, screening_windows, status
 from i18n import TRANSLATIONS, get_translator
 from models import Patient, db
 
@@ -81,6 +81,7 @@ def create_app(db_path: str | None = None) -> Flask:
                         "days": s.days,
                         "trimester": s.trimester,
                         "days_remaining": s.days_remaining,
+                        "screenings": screening_windows(lmp, today),
                     }
             except (ValueError, TypeError) as e:
                 error = str(e)
