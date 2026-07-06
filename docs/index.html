@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מחשבון הריון</title>
+<style>
+:root {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --accent: #d6336c;
+    --accent-ink: #ffffff;
+    --border: #e5e7eb;
+    --good: #ecfdf5;
+    --bad: #fef2f2;
+    --bad-ink: #991b1b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, "Noto Sans Hebrew", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+}
+.brand {
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+.topbar nav { display: flex; gap: 16px; align-items: center; }
+.topbar nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.topbar nav a:hover { color: var(--accent); }
+
+main {
+    max-width: 640px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+h1 { margin: 0 0 4px; font-size: 1.5rem; }
+.subtitle { margin: 0 0 20px; color: var(--muted); }
+
+.flash {
+    background: var(--bad);
+    border: 1px solid #fecaca;
+    color: var(--bad-ink);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.calc-form { display: flex; flex-direction: column; gap: 16px; }
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: 10px;
+}
+.tab {
+    flex: 1;
+    cursor: pointer;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+.tab input { display: none; }
+.tab:has(input:checked) {
+    background: var(--card);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    font-weight: 600;
+}
+
+.pane { display: none; flex-direction: column; gap: 12px; }
+.pane.active { display: flex; }
+
+label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9rem;
+    color: var(--muted);
+    gap: 4px;
+}
+input[type="date"],
+input[type="number"] {
+    font: inherit;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+}
+input:focus { outline: none; border-color: var(--accent); }
+
+.row { display: flex; gap: 12px; }
+.row > label { flex: 1; }
+
+.cycle { max-width: 200px; }
+
+button {
+    font: inherit;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 8px;
+    cursor: pointer;
+}
+button:hover { background: var(--bg); }
+button.primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    font-weight: 600;
+}
+button.primary:hover { filter: brightness(1.05); }
+
+.results {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+.results[hidden] { display: none; }
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+.result-row:last-child { border-bottom: none; }
+.result-row span { color: var(--muted); }
+.result-row strong { font-size: 1.1rem; }
+
+.screenings-heading {
+    margin: 20px 0 4px;
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+.result-row.screening strong {
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.result-row.screening .badge {
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.status-passed .badge { background: #f3f4f6; color: var(--muted); }
+.status-current { background: #ecfdf5; }
+.status-current .badge { background: #10b981; color: #fff; }
+.status-upcoming .badge { background: #dbeafe; color: #1e40af; }
+
+@media (max-width: 480px) {
+    main { margin: 12px auto; }
+    .card { padding: 16px; border-radius: 8px; }
+    h1 { font-size: 1.25rem; }
+    .row { flex-direction: column; }
+    .result-row.screening {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+    }
+    .result-row.screening strong {
+        white-space: nowrap;
+        font-size: 0.9rem;
+    }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="#" data-i18n="title"></a>
+    <nav>
+        <a class="lang-toggle" id="langToggle" data-i18n="lang_other"></a>
+    </nav>
+</header>
+<main>
+<section class="card">
+    <h1 data-i18n="title"></h1>
+    <p class="subtitle" data-i18n="subtitle"></p>
+
+    <div class="flash" id="error" hidden></div>
+
+    <form class="calc-form" id="calcForm">
+        <div class="tabs">
+            <label class="tab">
+                <input type="radio" name="mode" value="lmp" checked>
+                <span data-i18n="tab_lmp"></span>
+            </label>
+            <label class="tab">
+                <input type="radio" name="mode" value="age">
+                <span data-i18n="tab_age"></span>
+            </label>
+        </div>
+
+        <div class="pane" data-mode="lmp">
+            <label>
+                <span data-i18n="lmp_label"></span>
+                <input type="date" name="lmp">
+            </label>
+        </div>
+
+        <div class="pane" data-mode="age">
+            <label>
+                <span data-i18n="as_of_label"></span>
+                <input type="date" name="as_of">
+            </label>
+            <div class="row">
+                <label>
+                    <span data-i18n="weeks_label"></span>
+                    <input type="number" name="weeks" min="0" max="45">
+                </label>
+                <label>
+                    <span data-i18n="days_label"></span>
+                    <input type="number" name="days" min="0" max="6" value="0">
+                </label>
+            </div>
+        </div>
+
+        <label class="cycle">
+            <span data-i18n="cycle_label"></span>
+            <input type="number" name="cycle" min="20" max="45" value="28">
+        </label>
+
+        <button type="submit" class="primary" data-i18n="calc_button"></button>
+    </form>
+
+    <section class="results" id="results" hidden></section>
+</section>
+</main>
+
+<script>
+"use strict";
+
+// ---- i18n (he / en) ---------------------------------------------------------
+const TRANSLATIONS = {
+    he: {
+        title: "מחשבון הריון",
+        subtitle: "חישוב תאריך לידה משוער ושבוע נוכחי",
+        tab_lmp: "לפי וסת אחרונה",
+        tab_age: "לפי שבוע נוכחי",
+        lmp_label: "תאריך וסת אחרונה (יום ראשון)",
+        cycle_label: "אורך מחזור (ימים)",
+        as_of_label: "נכון לתאריך",
+        weeks_label: "שבועות",
+        days_label: "ימים",
+        calc_button: "חשב",
+        result_edd: "תאריך לידה משוער",
+        result_now: "שבוע נוכחי",
+        result_trimester: "טרימסטר",
+        result_remaining: "ימים שנותרו",
+        screenings_heading: "בדיקות הריון מומלצות",
+        screening_nuchal: "שקיפות עורפית",
+        screening_early: "סקירה מוקדמת",
+        screening_second: "סקירה שניה",
+        screening_third: "סקירה שלישית",
+        status_passed: "עבר",
+        status_current: "פעיל",
+        status_upcoming: "עתידי",
+        lang_other: "English",
+        weeks_short: "ש'",
+        days_short: "י'",
+        error_input: "יש להזין תאריך וסת אחרונה או שבוע נוכחי",
+    },
+    en: {
+        title: "Pregnancy Calculator",
+        subtitle: "Estimated due date and current gestational age",
+        tab_lmp: "By LMP",
+        tab_age: "By current week",
+        lmp_label: "Last menstrual period (first day)",
+        cycle_label: "Cycle length (days)",
+        as_of_label: "As of date",
+        weeks_label: "Weeks",
+        days_label: "Days",
+        calc_button: "Calculate",
+        result_edd: "Estimated due date",
+        result_now: "Current gestational age",
+        result_trimester: "Trimester",
+        result_remaining: "Days remaining",
+        screenings_heading: "Recommended screening tests",
+        screening_nuchal: "Nuchal translucency",
+        screening_early: "Early anomaly scan",
+        screening_second: "Second anomaly scan",
+        screening_third: "Third anomaly scan",
+        status_passed: "Passed",
+        status_current: "Current",
+        status_upcoming: "Upcoming",
+        lang_other: "עברית",
+        weeks_short: "w",
+        days_short: "d",
+        error_input: "Enter a last menstrual period date or current week",
+    },
+};
+
+let lang = localStorage.getItem("lang") || "he";
+function t(key) { return (TRANSLATIONS[lang] || TRANSLATIONS.he)[key] || key; }
+
+// ---- date helpers (UTC-anchored to avoid DST drift) -------------------------
+function parseISO(s) {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d));
+}
+function toISO(dt) {
+    const y = dt.getUTCFullYear();
+    const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(dt.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+function addDays(dt, n) { return new Date(dt.getTime() + n * 86400000); }
+function diffDays(a, b) { return Math.round((a.getTime() - b.getTime()) / 86400000); }
+function todayUTC() {
+    const n = new Date();
+    return new Date(Date.UTC(n.getFullYear(), n.getMonth(), n.getDate()));
+}
+
+// ---- pregnancy math (ported from calc.py) -----------------------------------
+const GESTATION_DAYS = 280; // Naegele's rule: LMP + 40 weeks
+
+function eddFromLmp(lmp, cycle) {
+    if (cycle < 20 || cycle > 45) throw new Error("cycle_length must be between 20 and 45 days");
+    return addDays(lmp, GESTATION_DAYS + (cycle - 28));
+}
+
+function lmpFromGestationalAge(weeks, days, onDate, cycle) {
+    if (!(weeks >= 0 && weeks <= 45)) throw new Error("weeks out of range");
+    if (!(days >= 0 && days <= 6)) throw new Error("days must be 0-6");
+    const elapsed = weeks * 7 + days;
+    return addDays(onDate, -elapsed - (cycle - 28));
+}
+
+// Standard Israeli prenatal ultrasound screening windows, LMP-anchored.
+// [i18n_key, [startWeek, startDay], [endWeek, endDay]] — inclusive bounds.
+const SCREENING_WINDOWS = [
+    ["screening_nuchal", [11, 0], [13, 6]],
+    ["screening_early",  [14, 0], [16, 6]],
+    ["screening_second", [20, 0], [24, 6]],
+    ["screening_third",  [30, 0], [32, 0]],
+];
+
+function screeningWindows(lmp, today) {
+    return SCREENING_WINDOWS.map(([key, [sw, sd], [ew, ed]]) => {
+        const start = addDays(lmp, sw * 7 + sd);
+        const end = addDays(lmp, ew * 7 + ed);
+        let status;
+        if (today < start) status = "upcoming";
+        else if (today > end) status = "passed";
+        else status = "current";
+        return { key, start, end, status };
+    });
+}
+
+function status(lmp, today, cycle) {
+    const edd = eddFromLmp(lmp, cycle);
+    let elapsed = diffDays(today, lmp);
+    if (elapsed < 0) elapsed = 0;
+    const weeks = Math.floor(elapsed / 7);
+    const days = elapsed % 7;
+    let trimester;
+    if (weeks < 14) trimester = 1;
+    else if (weeks < 28) trimester = 2;
+    else trimester = 3;
+    return { edd, weeks, days, trimester, daysRemaining: diffDays(edd, today) };
+}
+
+// ---- rendering --------------------------------------------------------------
+function applyI18n() {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
+    document.title = t("title");
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+}
+
+const form = document.getElementById("calcForm");
+const resultsEl = document.getElementById("results");
+const errorEl = document.getElementById("error");
+const panes = document.querySelectorAll(".pane[data-mode]");
+
+function syncPanes() {
+    const sel = form.querySelector('input[name="mode"]:checked');
+    const mode = sel ? sel.value : "lmp";
+    panes.forEach(p => p.classList.toggle("active", p.dataset.mode === mode));
+}
+
+function row(label, value, extraClass) {
+    const div = document.createElement("div");
+    div.className = "result-row" + (extraClass ? " " + extraClass : "");
+    const span = document.createElement("span");
+    span.textContent = label;
+    const strong = document.createElement("strong");
+    if (typeof value === "string") strong.textContent = value;
+    else strong.appendChild(value);
+    div.append(span, strong);
+    return div;
+}
+
+function calculate() {
+    errorEl.hidden = true;
+    const data = new FormData(form);
+    const mode = data.get("mode");
+    const cycle = parseInt(data.get("cycle") || "28", 10);
+
+    let lmp = null;
+    try {
+        if (mode === "lmp" && data.get("lmp")) {
+            lmp = parseISO(data.get("lmp"));
+        } else if (mode === "age" && data.get("weeks")) {
+            const onDate = data.get("as_of") ? parseISO(data.get("as_of")) : todayUTC();
+            lmp = lmpFromGestationalAge(
+                parseInt(data.get("weeks"), 10),
+                parseInt(data.get("days") || "0", 10),
+                onDate, cycle
+            );
+        }
+        if (lmp === null) {
+            errorEl.textContent = t("error_input");
+            errorEl.hidden = false;
+            resultsEl.hidden = true;
+            return;
+        }
+        const today = todayUTC();
+        const s = status(lmp, today, cycle);
+        const screenings = screeningWindows(lmp, today);
+        renderResults(s, screenings);
+    } catch (e) {
+        errorEl.textContent = e.message;
+        errorEl.hidden = false;
+        resultsEl.hidden = true;
+    }
+}
+
+function renderResults(s, screenings) {
+    resultsEl.replaceChildren();
+    resultsEl.appendChild(row(t("result_edd"), toISO(s.edd)));
+    resultsEl.appendChild(row(
+        t("result_now"),
+        `${s.weeks}${t("weeks_short")} ${s.days}${t("days_short")}`
+    ));
+    resultsEl.appendChild(row(t("result_trimester"), String(s.trimester)));
+    resultsEl.appendChild(row(t("result_remaining"), String(s.daysRemaining)));
+
+    const h3 = document.createElement("h3");
+    h3.className = "screenings-heading";
+    h3.textContent = t("screenings_heading");
+    resultsEl.appendChild(h3);
+
+    screenings.forEach(w => {
+        const strong = document.createElement("strong");
+        strong.append(`${toISO(w.start)} → ${toISO(w.end)} `);
+        const badge = document.createElement("em");
+        badge.className = "badge";
+        badge.textContent = t("status_" + w.status);
+        strong.appendChild(badge);
+        resultsEl.appendChild(row(t(w.key), strong, "screening status-" + w.status));
+    });
+
+    resultsEl.hidden = false;
+}
+
+// ---- wiring -----------------------------------------------------------------
+form.querySelectorAll('input[name="mode"]').forEach(r =>
+    r.addEventListener("change", syncPanes));
+
+form.addEventListener("submit", e => {
+    e.preventDefault();
+    calculate();
+});
+
+document.getElementById("langToggle").addEventListener("click", e => {
+    e.preventDefault();
+    lang = lang === "he" ? "en" : "he";
+    localStorage.setItem("lang", lang);
+    applyI18n();
+    if (!resultsEl.hidden) calculate(); // re-render results in new language
+});
+
+// default "as of" date = today
+form.querySelector('input[name="as_of"]').value = toISO(todayUTC());
+applyI18n();
+syncPanes();
+</script>
+</body>
+</html>
